@@ -1,16 +1,32 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
+import { AuthComponent } from './auth/auth.component';
+import { AppRoutingModule } from './app-routing.module';
+import { AuthService } from './auth/auth.service';
+import { RecipesComponent } from './recipes/recipes.component';
+import { RecipeDisplayComponent } from './recipes/recipe-display/recipe-display.component';
+import { RecipeIndividualComponent } from './recipes/recipe-display/recipe-individual/recipe-individual.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    AuthComponent,
+    RecipesComponent,
+    RecipeDisplayComponent,
+    RecipeIndividualComponent
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    FormsModule,
+    ReactiveFormsModule,
+    HttpClientModule,
+    AppRoutingModule
   ],
-  providers: [],
+  providers: [AuthService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
