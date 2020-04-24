@@ -1,9 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { RecipeService } from '../recipe.service';
-import { Router, ActivatedRoute } from '@angular/router';
 import { Recipe } from '../recipe.model';
-import { FormGroup } from '@angular/forms';
+import { FormGroup, FormArray, FormControl, Validators } from '@angular/forms';
+import { DataStorageService } from '../../shared/data-storage.service';
 
 @Component({
   selector: 'app-recipe-display',
@@ -13,30 +13,96 @@ import { FormGroup } from '@angular/forms';
 export class RecipeDisplayComponent implements OnInit, OnDestroy {
   recipes: Recipe[];
   subscription: Subscription;
-  showAddRecipe: boolean;
-  recipeForm: FormGroup;
+  id: any;
 
-  constructor(private recipeService: RecipeService, private router: Router, private route: ActivatedRoute) { }
+  showAddRecipe: boolean;
+  recipeAddForm: FormGroup;
+
+  constructor(private recipeService: RecipeService, private dataStorageService: DataStorageService) { }
 
   ngOnInit() {
+    this.dataStorageService.fetchRecipes();
+    this.recipes = this.recipeService.getRecipes();
+    this.id = 0;
+
+    this.initForm();
     this.subscription = this.recipeService.recipesChanged
       .subscribe(
         (recipes: Recipe[]) => {
           this.recipes = recipes;
         }
       );
-      this.recipes = this.recipeService.getRecipes();
   }
 
-  onNewRecipe(){
-    this.showAddRecipe = true;
+  private initForm() {
+    console.log('initform called')
 
-    this.recipeService.addRecipe(this.recipeForm.value);
+    const allRecipes = this.recipeService.getRecipes();
+    console.log(allRecipes)
+    const recipe = this.recipeService.getRecipe(this.id);
+    console.log(recipe)
+
+    let recipeName = '';
+    let recipeInstructions = '';
+    let recipeIngredients = new FormArray([]);
+
+      for(let formIngredient of recipe.ingredients){ //loops through all ingredients
+        recipeIngredients.push(
+          new FormGroup({
+            ingredientName: new FormControl(formIngredient.name),
+            ingredientAmount: new FormControl(formIngredient.amount)
+          })
+        )
+      }
+    
+
+    this.recipeAddForm = new FormGroup({
+      name: new FormControl(recipeName),
+      instructions: new FormControl(recipeInstructions),
+      ingredients: recipeIngredients
+      // ingredients: new FormGroup({ingredientName: new FormControl(), ingredientAmount: new FormControl()})
+      // ingredients: new FormGroup({ingredientName: new FormControl(recipeIngredients), ingredientAmount: new FormControl(recipeIngredients)})
+    })
 
   }
 
+  toggleAddRecipe(){
+    if(this.showAddRecipe){
+      this.showAddRecipe = false;
+    } else {
+      this.showAddRecipe = true;
+    }
+  }
 
-  ngOnDestroy() {
+  onAddRecipeSubmit(){
+    console.log('submitted!')
+    this.recipeService.addRecipe(this.recipeAddForm.value);
+    this.dataStorageService.storeRecipes();
+    this.recipeAddForm.reset();
+    this.onCancel();
+  }
+
+  onCancel(){
+    this.showAddRecipe = false;
+  }
+
+  onAddIngredient(){
+    (<FormArray>this.recipeAddForm.get('ingredients')).push(
+      new FormGroup({
+        name: new FormControl(null, Validators.required),
+        amount: new FormControl(null, [
+          Validators.required,
+          Validators.pattern(/^[1-9]+[0-9]*$/)
+        ])
+      })
+    );
+  }
+
+  onDeleteIngredient(index: number){
+    (<FormArray>this.recipeAddForm.get('ingredients')).removeAt(index);
+  }
+
+  ngOnDestroy(): void {
     this.subscription.unsubscribe();
   }
 

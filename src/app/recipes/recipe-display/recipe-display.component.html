@@ -1,20 +1,68 @@
+<!--ADD RECIPE BUTTON-->
 <div class='row'>
     <div class='col-xs-12'>
-        <button class='btn btn-success' (click)='onNewRecipe()'>New Recipe</button>
+        <button class='btn btn-success' (click)='toggleAddRecipe()'>New Recipe</button>
     </div>
 </div>
 
 <hr>
 
+<!--DISPLAYING ALL RECIPES-->
 <div class='row'>
     <div class='col-xs-12'>
         <app-recipe-individual
             *ngFor='let recipeEl of recipes; let i = index'
             [recipe]='recipeEl'
-            [index]='i'></app-recipe-individual>
+            [index]='i'>
+        </app-recipe-individual>
     </div>
 </div>
 
-<form *ngIf='showAddRecipe === true'>
-    <input type='text' id='name'>
-</form>
+<!--RECIPE ADD FORM-->
+<div class='row' *ngIf='showAddRecipe === true'>
+    <div class='col'>
+        <form [formGroup]='recipeAddForm' (ngSubmit)='onAddRecipeSubmit()'>
+            <div class='row'>
+                <div class='col'>
+                    <button type='submit' class='btn btn-success'>Add Recipe</button>
+                    <button type='button' class='btn btn-danger' (click)='onCancel()'>Cancel</button>
+                </div>
+            </div>
+            <!--RECIPE NAME-->
+            <div class="form-group">
+                <label for="recipeName">Recipe Name</label>
+                <input type="text" id='recipeName' formControlName='name' class="form-control">
+            </div>
+            <!--RECIPE INSTRUCTIONS-->
+            <div class='form-group'>
+                <label for='recipeInstructions'>Recipe Instructions</label>
+                <textarea type='text' id='recipeInstructions' formControlName='instructions' class='form-control' rows='6'></textarea>
+            </div>
+            <!--RECIPE INGREDIENTS-->
+            <div class='row'>
+                <div class='col-xs-12' formArrayName='ingredients'>
+                    <div class='row'>
+                        <div class='col-xs-8'>
+                            <label for='ingredientName'>Ingredient Name</label>
+                            <input type='text' class='form-control' formControlName='ingredientName'>
+                        </div>
+                        <div class='col-xs-8'>
+                            <label for='ingredientAmount'>Ingredient Amount</label>
+                            <input type='text' class='form-control' formControlName='ingredientAmount'>
+                        </div>
+                    </div>
+                    <div class='row'>
+                        <div class='col-xs-8'>
+                            <label for='ingredientName'>Ingredient Name</label>
+                            <input type='text' class='form-control' formControlName='ingredientName'>
+                        </div>
+                        <div class='col-xs-8'>
+                            <label for='ingredientAmount'>Ingredient Amount</label>
+                            <input type='text' class='form-control' formControlName='ingredientAmount'>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

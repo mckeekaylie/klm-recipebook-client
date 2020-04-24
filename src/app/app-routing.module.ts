@@ -6,7 +6,8 @@ import { RecipesComponent } from './recipes/recipes.component';
 
 const appRoutes: Routes = [
     {path: 'auth', component: AuthComponent},
-    {path: 'recipes', component: RecipesComponent}
+    {path: 'recipes', component: RecipesComponent},
+    {path: 'recipes/:id', component: RecipesComponent}
 ];
 
 @NgModule({
